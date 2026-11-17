@@ -1,4 +1,17 @@
 package nu.youritguy.kanban_api.domain.exceptions;
 
-public class RecordNotFoundException {
+import java.io.Serial;
+import java.util.UUID;
+
+public class RecordNotFoundException extends Exception {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    public RecordNotFoundException() {
+        super();
+    }
+
+    public RecordNotFoundException(UUID id) {
+        super(String.format("Can't find task [%s]", id));
+    }
 }
