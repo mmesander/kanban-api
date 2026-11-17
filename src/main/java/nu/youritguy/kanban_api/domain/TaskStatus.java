@@ -1,4 +1,4 @@
-package nu.youritguy.kanban_api.enums;
+package nu.youritguy.kanban_api.domain;
 
 import lombok.Getter;
 

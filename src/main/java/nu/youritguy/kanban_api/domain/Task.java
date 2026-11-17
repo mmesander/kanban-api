@@ -1,8 +1,7 @@
-package nu.youritguy.kanban_api.models;
+package nu.youritguy.kanban_api.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import nu.youritguy.kanban_api.enums.TaskStatus;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +14,12 @@ public class Task {
     private TaskStatus status;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public Task() {
+        this.status = TaskStatus.TO_DO;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public Task(String title, String description) {
         this.id = null;
