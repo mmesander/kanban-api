@@ -1,4 +1,4 @@
-package nu.youritguy.kanban_api.domain;
+package nu.youritguy.kanban_api.domain.models;
 
 import lombok.Getter;
 
