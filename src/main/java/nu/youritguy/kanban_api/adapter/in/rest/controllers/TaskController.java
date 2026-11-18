@@ -31,6 +31,7 @@ public class TaskController {
         this.createTaskUseCase = createTaskUseCase;
     }
 
+    // CRUD Operations
     @PostMapping
     @ApiResponse(responseCode = "201", description = "Created Task")
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -51,6 +52,7 @@ public class TaskController {
         }
     }
 
+    // Helpers
     private TaskStatus parseOptionalStatus(String status) {
         return status == null || status.isBlank() ? null : TaskStatus.retrieveEnumFromInputStatus(status.trim());
     }

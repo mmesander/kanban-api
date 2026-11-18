@@ -26,4 +26,18 @@ public class Task {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public static Task createTask(String title, String description, TaskStatus status) {
+        Task task = new Task();
+        Instant now = Instant.now();
+
+        task.id = UUID.randomUUID();
+        task.title = title;
+        task.description = description;
+        task.status = status != null ? status : TaskStatus.TO_DO;
+        task.createdAt = now;
+        task.updatedAt = now;
+
+        return task;
+    }
 }
