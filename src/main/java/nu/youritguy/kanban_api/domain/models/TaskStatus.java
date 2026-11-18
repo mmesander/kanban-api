@@ -22,7 +22,7 @@ public enum TaskStatus {
                 .filter(taskStatus -> taskStatus.name().equalsIgnoreCase(status) || taskStatus.label.equalsIgnoreCase(status))
                 .findFirst()
                 .orElseThrow(() -> new InvalidInputException(String.format(
-                        "Status [%s] unknown. Allowed values: TO_DO, To Do, IN_PROGRESS, In Progress and DONE"
+                        "Status [%s] unknown. Allowed values: TO_DO, To Do, IN_PROGRESS, In Progress and DONE", status
                 )));
     }
 }
