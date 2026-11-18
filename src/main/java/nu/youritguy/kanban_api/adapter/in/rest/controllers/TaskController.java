@@ -1,9 +1,9 @@
-package nu.youritguy.kanban_api.adapter;
+package nu.youritguy.kanban_api.adapter.in.rest.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import nu.youritguy.kanban_api.adapter.dtos.TaskInputDto;
-import nu.youritguy.kanban_api.adapter.dtos.TaskDto;
+import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskInputDto;
+import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
@@ -20,7 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.UUID;
 
-import static nu.youritguy.kanban_api.adapter.dtos.TaskDto.createTaskDto;
+import static nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto.createTaskDto;
 
 @RestController
 @RequestMapping("/api/tasks")

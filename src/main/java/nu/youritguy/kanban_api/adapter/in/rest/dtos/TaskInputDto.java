@@ -1,4 +1,4 @@
-package nu.youritguy.kanban_api.adapter.dtos;
+package nu.youritguy.kanban_api.adapter.in.rest.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +14,7 @@ public class TaskInputDto {
     @Size(max = 100, message = "Title can't exceed 100 characters")
     private String title;
 
-    @Size(max = 1000, message = "Description can't exceed 1000 characters")
+    @Size(max = 500, message = "Description can't exceed 500 characters")
     private String description;
 
     @Schema(allowableValues = {"TO_DO", "IN_PROGRESS", "DONE", "To Do", "In Progress", "Done"})

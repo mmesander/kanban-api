@@ -1,4 +1,4 @@
-package nu.youritguy.kanban_api.adapter.dtos;
+package nu.youritguy.kanban_api.adapter.in.rest.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
