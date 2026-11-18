@@ -3,7 +3,7 @@ package nu.youritguy.kanban_api.domain.models;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -13,30 +13,17 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    public Task() {
-        this.status = TaskStatus.TO_DO;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+    public Task() {}
 
-    public Task(String title, String description) {
-        this.id = null;
-        this.title = title;
-        this.description = description;
-        this.status = TaskStatus.TO_DO;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public Task(UUID id, String title, String description, TaskStatus status, LocalDateTime createdAt) {
+    public Task(UUID id, String title, String description, TaskStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.createdAt = createdAt;
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = updatedAt;
     }
 }

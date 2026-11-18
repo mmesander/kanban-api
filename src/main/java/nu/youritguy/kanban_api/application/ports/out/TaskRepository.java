@@ -1,4 +1,7 @@
 package nu.youritguy.kanban_api.application.ports.out;
 
-public class TaskRepository {
+import nu.youritguy.kanban_api.domain.models.Task;
+
+public interface TaskRepository {
+    Task saveTask(Task task);
 }
