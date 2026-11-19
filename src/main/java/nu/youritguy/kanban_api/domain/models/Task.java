@@ -47,8 +47,9 @@ public class Task {
         if (StringUtils.isNotBlank(title)) {
             this.title = title;
         }
-        if (StringUtils.isNotBlank(description)) {
-            this.description = description;
+        // null = field not sent, keep current value; blank = clear the description
+        if (description != null) {
+            this.description = StringUtils.isNotBlank(description) ? description : null;
         }
         if (status != null) {
             this.status = status;

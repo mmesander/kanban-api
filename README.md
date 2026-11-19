@@ -274,10 +274,10 @@ Partially updates a task: only the fields you send are changed. `updatedAt` is s
 | Field         | Type   | Rules                                                                   |
 |---------------|--------|-------------------------------------------------------------------------|
 | `title`       | string | 1 to 100 characters. Ignored when left out or blank                     |
-| `description` | string | Max 500 characters. Ignored when left out or blank                      |
+| `description` | string | Max 500 characters. Ignored when left out; an empty string (`""`) clears the description |
 | `status`      | string | See allowed status values above. Ignored when left out or blank         |
 
-> **Note:** because blank values are ignored, a description cannot be cleared via this endpoint.
+To remove the description of a task, send `{"description": ""}`.
 
 **Example request**
 
