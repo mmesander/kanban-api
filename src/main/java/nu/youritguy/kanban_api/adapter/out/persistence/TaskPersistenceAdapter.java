@@ -5,6 +5,8 @@ import nu.youritguy.kanban_api.domain.models.Task;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Profile("h2")
 public class TaskPersistenceAdapter implements TaskRepository {
@@ -14,6 +16,14 @@ public class TaskPersistenceAdapter implements TaskRepository {
     public TaskPersistenceAdapter(TaskJpaRepository taskJpaRepository, TaskJpaMapper taskJpaMapper) {
         this.taskJpaRepository = taskJpaRepository;
         this.taskJpaMapper = taskJpaMapper;
+    }
+
+    @Override
+    public List<Task> getAllTasks() {
+        List<TaskJpaEntity> entities = taskJpaRepository.findAll();
+        return entities.stream()
+                .map(taskJpaMapper::transformToDomain)
+                .toList();
     }
 
     @Override

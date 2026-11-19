@@ -7,11 +7,11 @@ import nu.youritguy.kanban_api.domain.models.TaskOverview;
 import java.util.List;
 import java.util.UUID;
 
-public interface GetTasksUseCase {
-    List<Task> getTasks();
-    TaskOverview getTaskSummary();
-    Task getTaskById(GetTaskByIdCommand command);
-    List<Task> getTasksByStatus(GetTasksByStatusCommand command);
+public interface GetTaskUseCase {
+    List<Task> getAllTasks();
+//    TaskOverview getTaskOverview();
+//    Task getTaskById(GetTaskByIdCommand command);
+//    List<Task> getTasksByStatus(GetTasksByStatusCommand command);
 
     record GetTaskByIdCommand(UUID id) {}
     record GetTasksByStatusCommand(TaskStatus status) {}

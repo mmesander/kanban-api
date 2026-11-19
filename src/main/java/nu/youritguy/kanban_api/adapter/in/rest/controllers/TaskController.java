@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskInputDto;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
+import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskStatus;
@@ -12,13 +13,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto.createTaskDto;
@@ -27,12 +28,26 @@ import static nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto.createTaskDto
 @RequestMapping("/api/tasks")
 public class TaskController {
     private final CreateTaskUseCase createTaskUseCase;
+    private final GetTaskUseCase getTaskUseCase;
 
-    public TaskController(CreateTaskUseCase createTaskUseCase) {
+    public TaskController(CreateTaskUseCase createTaskUseCase, GetTaskUseCase getTaskUseCase) {
         this.createTaskUseCase = createTaskUseCase;
+        this.getTaskUseCase = getTaskUseCase;
     }
 
     // CRUD Operations
+    @GetMapping
+    public ResponseEntity<List<TaskDto>> getAllTasks() {
+        List<Task> tasks = getTaskUseCase.getAllTasks();
+
+        List<TaskDto> taskDtos = tasks.stream()
+                .filter(Objects::nonNull)
+                .map(TaskDto::createTaskDto)
+                .toList();
+
+        return ResponseEntity.ok().body(taskDtos);
+    }
+
     @PostMapping
     @ApiResponse(responseCode = "201", description = "Created Task")
     @ApiResponse(responseCode = "400", description = "Invalid input")
@@ -45,7 +60,7 @@ public class TaskController {
             throw new InvalidInputException(handleBindingResultError(bindingResult));
         } else {
             Task task = createTaskUseCase.createTask(new CreateTaskUseCase.CreateTaskCommand(
-                    inputDto.getTitle(), inputDto.getDescription(), parseOptionalStatus(inputDto.getStatus())));
+                    inputDto.getTitle(), inputDto.getDescription(), parseStatus(inputDto.getStatus())));
 
             URI uri = buildUriId(task.getId());
 
@@ -54,8 +69,8 @@ public class TaskController {
     }
 
     // Helpers
-    private TaskStatus parseOptionalStatus(String status) {
-        return StringUtils.isBlank(status) ? null : TaskStatus.retrieveEnumFromInputStatus(status.trim());
+    private TaskStatus parseStatus(String status) {
+        return StringUtils.isNotBlank(status) ? TaskStatus.retrieveEnumFromInputStatus(status.trim()) : null;
     }
 
     private String handleBindingResultError(BindingResult bindingResult) {
