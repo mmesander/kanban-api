@@ -88,9 +88,8 @@ whether the tables match the JPA entities. If they don't, the application will n
 
 | Method   | URL                       | Description                                   |
 |----------|---------------------------|-----------------------------------------------|
-| `GET`    | `/api/tasks`              | [Get all tasks](#get-all-tasks)               |
+| `GET`    | `/api/tasks`              | [Get all tasks, optionally filtered by status](#get-tasks) |
 | `GET`    | `/api/tasks/{id}`         | [Get a task by id](#get-a-task-by-id)         |
-| `GET`    | `/api/tasks/status`       | [Get tasks by status](#get-tasks-by-status)   |
 | `GET`    | `/api/tasks/overview`     | [Board overview](#board-overview)             |
 | `GET`    | `/api/tasks/summary`      | [Task count per status](#task-summary)        |
 | `POST`   | `/api/tasks`              | [Create a new task](#create-a-task)           |
@@ -115,13 +114,30 @@ Wherever a `status` is accepted as input, these values are allowed (case-insensi
 `TO_DO`, `IN_PROGRESS`, `DONE` or `To Do`, `In Progress`, `Done`.
 In responses, the status is always returned as `TO_DO`, `IN_PROGRESS` or `DONE`.
 
-### Get all tasks
+### Get tasks
 
 ```
 GET http://localhost:8095/api/tasks
+GET http://localhost:8095/api/tasks?status=IN_PROGRESS
 ```
 
-**Response** - `200 OK` with a list of task objects. Returns `[]` when there are no tasks.
+**Query parameters**
+
+| Parameter | Required | Description                                                                 |
+|-----------|----------|-----------------------------------------------------------------------------|
+| `status`  | no       | Only return tasks with this status. Left out or empty: all tasks are returned |
+
+Labels with a space must be URL-encoded, for example `?status=In%20Progress`.
+
+**Response** - `200 OK` with a list of task objects. Returns `[]` when there are no (matching) tasks.
+
+| Status            | When              | Example body                                  |
+|-------------------|-------------------|-----------------------------------------------|
+| `400 Bad Request` | Unknown `status`  | `Status [BUSY] unknown. Allowed values: ...`  |
+
+```bash
+curl "http://localhost:8095/api/tasks?status=IN_PROGRESS"
+```
 
 ### Get a task by id
 
@@ -134,37 +150,6 @@ GET http://localhost:8095/api/tasks/{id}
 | Status          | When                       | Example body                                              |
 |-----------------|----------------------------|-----------------------------------------------------------|
 | `404 Not Found` | No task with this `id`     | `Can't find task [3f2b8c1e-5d4a-4e7b-9c1a-2b6d8e0f7a91]`  |
-
-### Get tasks by status
-
-```
-GET http://localhost:8095/api/tasks/status
-Content-Type: application/json
-```
-
-The status is sent in the **request body**:
-
-```json
-{
-  "status": "IN_PROGRESS"
-}
-```
-
-**Response** - `200 OK` with a list of task objects with this status. Returns `[]` when there are none.
-
-| Status            | When                       | Example body                                      |
-|-------------------|----------------------------|---------------------------------------------------|
-| `400 Bad Request` | `status` is missing/blank  | `status: Status should not be empty`              |
-| `400 Bad Request` | Unknown `status`           | `Status [BUSY] unknown. Allowed values: ...`      |
-
-> **Note:** this is a `GET` request with a body. Not every client supports that: Swagger UI
-> and browsers don't send a body with `GET`. Use curl, PowerShell or Postman instead.
-
-```bash
-curl -X GET http://localhost:8095/api/tasks/status \
-  -H "Content-Type: application/json" \
-  -d '{"status":"IN_PROGRESS"}'
-```
 
 ### Board overview
 

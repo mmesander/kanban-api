@@ -1,5 +1,7 @@
 package nu.youritguy.kanban_api.adapter.in.rest.controllers;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.*;
@@ -43,8 +45,17 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getAllTasks() {
-        List<Task> tasks = getTaskUseCase.getAllTasks();
+    @ApiResponse(responseCode = "400", description = "Unknown status")
+    public ResponseEntity<List<TaskDto>> getTasks(
+            @Parameter(description = "Optional filter on status",
+                    schema = @Schema(allowableValues = {"TO_DO", "IN_PROGRESS", "DONE", "To Do", "In Progress", "Done"}))
+            @RequestParam(name = "status", required = false) String status
+    ) {
+        TaskStatus taskStatus = parseStatus(status);
+
+        List<Task> tasks = taskStatus == null
+                ? getTaskUseCase.getAllTasks()
+                : getTaskUseCase.getTasksByStatus(new GetTaskUseCase.GetTasksByStatusCommand(taskStatus));
 
         List<TaskDto> taskDtos = tasks.stream()
                 .filter(Objects::nonNull)
@@ -62,27 +73,6 @@ public class TaskController {
         Task task = getTaskUseCase.getTaskById(new GetTaskUseCase.GetTaskByIdCommand(id));
 
         return ResponseEntity.ok().body(TaskDto.createTaskDto(task));
-    }
-
-    @GetMapping("/status")
-    public ResponseEntity<List<TaskDto>> getTasksByStatus(
-            @Valid
-            @RequestBody StatusInputDto inputDto,
-            BindingResult bindingResult
-    ) {
-        if (bindingResult.hasErrors()) {
-            throw new InvalidInputException(handleBindingResultError(bindingResult));
-        }
-        List<Task> tasks = getTaskUseCase.getTasksByStatus(new GetTaskUseCase.GetTasksByStatusCommand(
-                parseStatus(inputDto.getStatus())
-        ));
-
-        List<TaskDto> taskDtos = tasks.stream()
-                .filter(Objects::nonNull)
-                .map(TaskDto::createTaskDto)
-                .toList();
-
-        return ResponseEntity.ok().body(taskDtos);
     }
 
     @GetMapping("/overview")
