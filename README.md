@@ -340,11 +340,7 @@ curl -X PATCH http://localhost:8095/api/tasks/{id}/status \
 DELETE http://localhost:8095/api/tasks/{id}
 ```
 
-**Response** - `200 OK` with a plain-text confirmation:
-
-```
-Deleted task [3f2b8c1e-5d4a-4e7b-9c1a-2b6d8e0f7a91]
-```
+**Response** - `204 No Content` with an empty body.
 
 | Status          | When                       | Example body                       |
 |-----------------|----------------------------|------------------------------------|

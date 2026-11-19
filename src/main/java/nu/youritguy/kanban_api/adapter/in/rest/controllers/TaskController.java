@@ -149,15 +149,13 @@ public class TaskController {
     @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204", description = "Task deleted")
     @ApiResponse(responseCode = "404", description = "Task not found")
-    public ResponseEntity<Object> deleteTask(
+    public ResponseEntity<Void> deleteTask(
             @PathVariable("id") UUID id
     ) {
         deleteTaskUseCase.deleteTask(id);
-        String confirmation = String.format("Deleted task [%s]", id);
 
-        return ResponseEntity.ok().body(confirmation);
+        return ResponseEntity.noContent().build();
     }
-
 
     // Helpers
     private TaskStatus parseStatus(String status) {
