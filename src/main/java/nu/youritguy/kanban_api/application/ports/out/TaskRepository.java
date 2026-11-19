@@ -14,10 +14,8 @@ public interface TaskRepository {
     List<Task> findTasksByStatus(TaskStatus status);
     int countByStatus(TaskStatus status);
 
-    // POST
+    // POST & PATCH
     Task saveTask(Task task);
 
-    // PUT
-    // PATCH
     // DELETE
 }

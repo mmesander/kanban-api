@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.*;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
+import nu.youritguy.kanban_api.application.ports.in.PatchTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskOverview;
@@ -27,12 +28,14 @@ import static nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto.createTaskDto
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
-    private final CreateTaskUseCase createTaskUseCase;
     private final GetTaskUseCase getTaskUseCase;
+    private final CreateTaskUseCase createTaskUseCase;
+    private final PatchTaskUseCase patchTaskUseCase;
 
-    public TaskController(CreateTaskUseCase createTaskUseCase, GetTaskUseCase getTaskUseCase) {
+    public TaskController(CreateTaskUseCase createTaskUseCase, GetTaskUseCase getTaskUseCase, PatchTaskUseCase patchTaskUseCase) {
         this.createTaskUseCase = createTaskUseCase;
         this.getTaskUseCase = getTaskUseCase;
+        this.patchTaskUseCase = patchTaskUseCase;
     }
 
     @GetMapping
@@ -48,6 +51,7 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
+    @ApiResponse(responseCode = "404", description = "Task not found")
     public ResponseEntity<TaskDto> getTaskById(
             @PathVariable("id") UUID id
     ) {
@@ -88,7 +92,7 @@ public class TaskController {
     public ResponseEntity<TaskSummaryDto> getTaskSummary() {
         TaskSummary taskSummary = getTaskUseCase.getTaskSummary();
 
-        return  ResponseEntity.ok().body(TaskSummaryDto.createTaskSummaryDto(taskSummary));
+        return ResponseEntity.ok().body(TaskSummaryDto.createTaskSummaryDto(taskSummary));
     }
 
     @PostMapping
@@ -110,6 +114,44 @@ public class TaskController {
             return ResponseEntity.created(uri).body(createTaskDto(task));
         }
     }
+
+    @PatchMapping("/{id}")
+    @ApiResponse(responseCode = "404", description = "Task not found")
+    public ResponseEntity<TaskDto> patchTask(
+            @PathVariable("id") UUID id,
+            @Valid
+            @RequestBody TaskPatchInputDto inputDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new InvalidInputException(handleBindingResultError(bindingResult));
+        } else {
+            Task task = patchTaskUseCase.patchTask(id, new PatchTaskUseCase.PatchTaskCommand(
+                    inputDto.getTitle(), inputDto.getDescription(), parseStatus(inputDto.getStatus())));
+
+            return ResponseEntity.ok().body(TaskDto.createTaskDto(task));
+        }
+    }
+
+    @PatchMapping("/{id}/status")
+    @ApiResponse(responseCode = "404", description = "Task not found")
+    public ResponseEntity<TaskDto> moveTask(
+            @PathVariable("id") UUID id,
+            @Valid
+            @RequestBody StatusInputDto inputDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasFieldErrors()) {
+            throw new InvalidInputException(handleBindingResultError(bindingResult));
+        } else {
+            Task task = patchTaskUseCase.moveTask(id, new PatchTaskUseCase.MoveTaskCommand(
+                    parseStatus(inputDto.getStatus())
+            ));
+
+            return ResponseEntity.ok().body(TaskDto.createTaskDto(task));
+        }
+    }
+
 
     // Helpers
     private TaskStatus parseStatus(String status) {

@@ -2,6 +2,7 @@ package nu.youritguy.kanban_api.application.services;
 
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
+import nu.youritguy.kanban_api.application.ports.in.PatchTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
 import nu.youritguy.kanban_api.domain.exceptions.RecordNotFoundException;
 import nu.youritguy.kanban_api.domain.models.Task;
@@ -10,6 +11,7 @@ import nu.youritguy.kanban_api.domain.models.TaskStatus;
 import nu.youritguy.kanban_api.domain.models.TaskSummary;
 
 import java.util.List;
+import java.util.UUID;
 
 import static nu.youritguy.kanban_api.domain.models.TaskSummary.createTaskSummary;
 
@@ -17,7 +19,7 @@ import static nu.youritguy.kanban_api.domain.models.TaskSummary.createTaskSummar
 // Het domein wordt gevraagd om een nieuwe task aan te maken
 // De task wordt opgeslagen in de repo
 // Het resultaat wordt geretourneerd
-public class TaskService implements CreateTaskUseCase, GetTaskUseCase {
+public class TaskService implements GetTaskUseCase, CreateTaskUseCase, PatchTaskUseCase {
     private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {
@@ -59,6 +61,27 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase {
     @Override
     public Task createTask(CreateTaskCommand command) {
         Task task = Task.createTask(command.title(), command.description(), command.status());
+
+        return taskRepository.saveTask(task);
+    }
+
+    @Override
+    public Task patchTask(UUID id, PatchTaskCommand command) {
+        Task task = taskRepository.findTaskById(id)
+                .orElseThrow(() -> new RecordNotFoundException(id));
+
+        task.patchTask(command.title(), command.description(), command.status());
+
+        return taskRepository.saveTask(task);
+    }
+
+    @Override
+    public Task moveTask(UUID id, MoveTaskCommand command) {
+        Task task = taskRepository.findTaskById(id)
+                .orElseThrow(() -> new RecordNotFoundException(id));
+
+        task.moveTask(command.status());
+
         return taskRepository.saveTask(task);
     }
 }

@@ -2,6 +2,7 @@ package nu.youritguy.kanban_api.domain.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,7 +17,8 @@ public class Task {
     private Instant createdAt;
     private Instant updatedAt;
 
-    public Task() {}
+    public Task() {
+    }
 
     public Task(UUID id, String title, String description, TaskStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
@@ -39,5 +41,23 @@ public class Task {
         task.updatedAt = now;
 
         return task;
+    }
+
+    public void patchTask(String title, String description, TaskStatus status) {
+        if (StringUtils.isNotBlank(title)) {
+            this.title = title;
+        }
+        if (StringUtils.isNotBlank(description)) {
+            this.description = description;
+        }
+        if (status != null) {
+            this.status = status;
+        }
+        this.updatedAt = Instant.now();
+    }
+
+    public void moveTask(TaskStatus status) {
+        this.status = status;
+        this.updatedAt = Instant.now();
     }
 }
