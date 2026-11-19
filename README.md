@@ -71,7 +71,7 @@ Spring runs this script at startup, which also fixes the order of the columns.
 Hibernate is set to `spring.jpa.hibernate.ddl-auto=validate`: at startup, Hibernate checks
 whether the tables match the JPA entities. If they don't, the application will not start.
 
-> **Note:** when you add a field to `TaskJpaEntity`, also add the column to `schema.sql`.
+> **Note:** when you add a field to `TaskEntity`, also add the column to `schema.sql`.
 
 **Table `tasks`**
 

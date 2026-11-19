@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface GetTaskUseCase {
     List<Task> getAllTasks();
-//    TaskOverview getTaskOverview();
-//    Task getTaskById(GetTaskByIdCommand command);
-//    List<Task> getTasksByStatus(GetTasksByStatusCommand command);
+    Task getTaskById(GetTaskByIdCommand command);
+    List<Task> getTasksByStatus(GetTasksByStatusCommand command);
+    TaskOverview getTaskOverview();
 
     record GetTaskByIdCommand(UUID id) {}
     record GetTasksByStatusCommand(TaskStatus status) {}

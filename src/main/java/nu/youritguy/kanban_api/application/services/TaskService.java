@@ -3,6 +3,7 @@ package nu.youritguy.kanban_api.application.services;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
+import nu.youritguy.kanban_api.domain.exceptions.RecordNotFoundException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskOverview;
 
@@ -22,6 +23,23 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase {
     @Override
     public List<Task> getAllTasks() {
         return taskRepository.getAllTasks();
+    }
+
+    @Override
+    public Task getTaskById(GetTaskByIdCommand command) {
+        return taskRepository.findTaskById(command.id())
+                .orElseThrow(() -> new RecordNotFoundException(command.id()));
+    }
+
+    @Override
+    public List<Task> getTasksByStatus(GetTasksByStatusCommand command) {
+        return taskRepository.findTasksByStatus(command.status());
+    }
+
+    @Override
+    public TaskOverview getTaskOverview() {
+        List<Task> allTasks = taskRepository.getAllTasks();
+        return TaskOverview.createTaskOverview(allTasks);
     }
 
     @Override

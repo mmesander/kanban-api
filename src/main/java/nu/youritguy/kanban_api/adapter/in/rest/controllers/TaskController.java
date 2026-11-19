@@ -2,12 +2,15 @@ package nu.youritguy.kanban_api.adapter.in.rest.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import nu.youritguy.kanban_api.adapter.in.rest.dtos.StatusInputDto;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskInputDto;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto;
+import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskOverviewDto;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
+import nu.youritguy.kanban_api.domain.models.TaskOverview;
 import nu.youritguy.kanban_api.domain.models.TaskStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,7 +37,6 @@ public class TaskController {
         this.getTaskUseCase = getTaskUseCase;
     }
 
-    // CRUD Operations
     @GetMapping
     public ResponseEntity<List<TaskDto>> getAllTasks() {
         List<Task> tasks = getTaskUseCase.getAllTasks();
@@ -46,6 +47,43 @@ public class TaskController {
                 .toList();
 
         return ResponseEntity.ok().body(taskDtos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskDto> getTaskById(
+            @PathVariable("id") UUID id
+    ) {
+        Task task = getTaskUseCase.getTaskById(new GetTaskUseCase.GetTaskByIdCommand(id));
+
+        return ResponseEntity.ok().body(TaskDto.createTaskDto(task));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<TaskDto>> getTasksByStatus(
+            @Valid
+            @RequestBody StatusInputDto inputDto,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            throw new InvalidInputException(handleBindingResultError(bindingResult));
+        }
+        List<Task> tasks = getTaskUseCase.getTasksByStatus(new GetTaskUseCase.GetTasksByStatusCommand(
+                parseStatus(inputDto.getStatus())
+        ));
+
+        List<TaskDto> taskDtos = tasks.stream()
+                .filter(Objects::nonNull)
+                .map(TaskDto::createTaskDto)
+                .toList();
+
+        return ResponseEntity.ok().body(taskDtos);
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<TaskOverviewDto> getTaskOverview() {
+        TaskOverview taskOverview = getTaskUseCase.getTaskOverview();
+
+        return ResponseEntity.ok().body(TaskOverviewDto.createTaskOverview(taskOverview));
     }
 
     @PostMapping

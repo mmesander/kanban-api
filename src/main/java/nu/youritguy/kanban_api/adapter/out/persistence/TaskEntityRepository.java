@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TaskJpaRepository extends JpaRepository<TaskJpaEntity, UUID> {
-    List<TaskJpaEntity> findAllByStatus(TaskStatus status);
-    Optional<TaskJpaEntity> findById(UUID id);
+public interface TaskEntityRepository extends JpaRepository<TaskEntity, UUID> {
+    Optional<TaskEntity> findById(UUID id);
+    List<TaskEntity> findAllByStatus(TaskStatus status);
 }

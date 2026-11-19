@@ -2,34 +2,52 @@ package nu.youritguy.kanban_api.adapter.out.persistence;
 
 import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
 import nu.youritguy.kanban_api.domain.models.Task;
+import nu.youritguy.kanban_api.domain.models.TaskOverview;
+import nu.youritguy.kanban_api.domain.models.TaskStatus;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 @Profile("h2")
 public class TaskPersistenceAdapter implements TaskRepository {
-    private final TaskJpaRepository taskJpaRepository;
-    private final TaskJpaMapper taskJpaMapper;
+    private final TaskEntityRepository taskEntityRepository;
+    private final TaskEntityMapper taskEntityMapper;
 
-    public TaskPersistenceAdapter(TaskJpaRepository taskJpaRepository, TaskJpaMapper taskJpaMapper) {
-        this.taskJpaRepository = taskJpaRepository;
-        this.taskJpaMapper = taskJpaMapper;
+    public TaskPersistenceAdapter(TaskEntityRepository taskEntityRepository, TaskEntityMapper taskEntityMapper) {
+        this.taskEntityRepository = taskEntityRepository;
+        this.taskEntityMapper = taskEntityMapper;
     }
 
     @Override
     public List<Task> getAllTasks() {
-        List<TaskJpaEntity> entities = taskJpaRepository.findAll();
+        List<TaskEntity> entities = taskEntityRepository.findAll();
         return entities.stream()
-                .map(taskJpaMapper::transformToDomain)
+                .map(taskEntityMapper::transformToDomain)
+                .toList();
+    }
+
+    @Override
+    public Optional<Task> findTaskById(UUID id) {
+        Optional<TaskEntity> entity = taskEntityRepository.findById(id);
+        return entity.map(taskEntityMapper::transformToDomain);
+    }
+
+    @Override
+    public List<Task> findTasksByStatus(TaskStatus status) {
+        List<TaskEntity> entities = taskEntityRepository.findAllByStatus(status);
+        return entities.stream()
+                .map(taskEntityMapper::transformToDomain)
                 .toList();
     }
 
     @Override
     public Task saveTask(Task task) {
-        TaskJpaEntity entity = taskJpaMapper.transformToEntity(task);
-        TaskJpaEntity createdTask = taskJpaRepository.save(entity);
-        return taskJpaMapper.transformToDomain(createdTask);
+        TaskEntity entity = taskEntityMapper.transformToEntity(task);
+        TaskEntity createdTask = taskEntityRepository.save(entity);
+        return taskEntityMapper.transformToDomain(createdTask);
     }
 }
