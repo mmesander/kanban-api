@@ -1,6 +1,7 @@
 package nu.youritguy.kanban_api.application.services;
 
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
+import nu.youritguy.kanban_api.application.ports.in.DeleteTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.PatchTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
@@ -19,7 +20,7 @@ import static nu.youritguy.kanban_api.domain.models.TaskSummary.createTaskSummar
 // Het domein wordt gevraagd om een nieuwe task aan te maken
 // De task wordt opgeslagen in de repo
 // Het resultaat wordt geretourneerd
-public class TaskService implements GetTaskUseCase, CreateTaskUseCase, PatchTaskUseCase {
+public class TaskService implements GetTaskUseCase, CreateTaskUseCase, PatchTaskUseCase, DeleteTaskUseCase {
     private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {
@@ -83,5 +84,13 @@ public class TaskService implements GetTaskUseCase, CreateTaskUseCase, PatchTask
         task.moveTask(command.status());
 
         return taskRepository.saveTask(task);
+    }
+
+    @Override
+    public void deleteTask(UUID id) {
+        if (!taskRepository.existsById(id)) {
+            throw new RecordNotFoundException(id);
+        }
+        taskRepository.deleteTask(id);
     }
 }

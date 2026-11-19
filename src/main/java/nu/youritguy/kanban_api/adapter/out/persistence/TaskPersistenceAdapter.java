@@ -54,4 +54,14 @@ public class TaskPersistenceAdapter implements TaskRepository {
         TaskEntity createdTask = taskEntityRepository.save(entity);
         return taskEntityMapper.transformToDomain(createdTask);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return taskEntityRepository.existsById(id);
+    }
+
+    @Override
+    public void deleteTask(UUID id) {
+        taskEntityRepository.deleteById(id);
+    }
 }

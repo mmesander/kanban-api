@@ -18,4 +18,6 @@ public interface TaskRepository {
     Task saveTask(Task task);
 
     // DELETE
+    boolean existsById(UUID id);
+    void deleteTask(UUID id);
 }
