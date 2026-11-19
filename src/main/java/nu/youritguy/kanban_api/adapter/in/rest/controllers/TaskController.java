@@ -8,6 +8,7 @@ import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskStatus;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -54,7 +55,7 @@ public class TaskController {
 
     // Helpers
     private TaskStatus parseOptionalStatus(String status) {
-        return status == null || status.isBlank() ? null : TaskStatus.retrieveEnumFromInputStatus(status.trim());
+        return StringUtils.isBlank(status) ? null : TaskStatus.retrieveEnumFromInputStatus(status.trim());
     }
 
     private String handleBindingResultError(BindingResult bindingResult) {
