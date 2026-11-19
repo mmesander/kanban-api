@@ -2,7 +2,6 @@ package nu.youritguy.kanban_api.adapter.out.persistence;
 
 import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
 import nu.youritguy.kanban_api.domain.models.Task;
-import nu.youritguy.kanban_api.domain.models.TaskOverview;
 import nu.youritguy.kanban_api.domain.models.TaskStatus;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
@@ -42,6 +41,11 @@ public class TaskPersistenceAdapter implements TaskRepository {
         return entities.stream()
                 .map(taskEntityMapper::transformToDomain)
                 .toList();
+    }
+
+    @Override
+    public int countByStatus(TaskStatus status) {
+        return taskEntityRepository.countByStatus(status);
     }
 
     @Override

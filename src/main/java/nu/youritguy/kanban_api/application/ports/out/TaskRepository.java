@@ -12,6 +12,7 @@ public interface TaskRepository {
     List<Task> getAllTasks();
     Optional<Task> findTaskById(UUID id);
     List<Task> findTasksByStatus(TaskStatus status);
+    int countByStatus(TaskStatus status);
 
     // POST
     Task saveTask(Task task);

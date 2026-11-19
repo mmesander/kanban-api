@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface TaskEntityRepository extends JpaRepository<TaskEntity, UUID> {
     Optional<TaskEntity> findById(UUID id);
     List<TaskEntity> findAllByStatus(TaskStatus status);
+    int countByStatus(TaskStatus status);
 }

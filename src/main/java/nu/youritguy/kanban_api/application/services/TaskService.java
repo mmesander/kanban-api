@@ -6,8 +6,12 @@ import nu.youritguy.kanban_api.application.ports.out.TaskRepository;
 import nu.youritguy.kanban_api.domain.exceptions.RecordNotFoundException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskOverview;
+import nu.youritguy.kanban_api.domain.models.TaskStatus;
+import nu.youritguy.kanban_api.domain.models.TaskSummary;
 
 import java.util.List;
+
+import static nu.youritguy.kanban_api.domain.models.TaskSummary.createTaskSummary;
 
 // In de service wordt de input van de useCase ontvangen
 // Het domein wordt gevraagd om een nieuwe task aan te maken
@@ -40,6 +44,16 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase {
     public TaskOverview getTaskOverview() {
         List<Task> allTasks = taskRepository.getAllTasks();
         return TaskOverview.createTaskOverview(allTasks);
+    }
+
+    @Override
+    public TaskSummary getTaskSummary() {
+        int toDo = taskRepository.countByStatus(TaskStatus.TO_DO);
+        int inProgress = taskRepository.countByStatus(TaskStatus.IN_PROGRESS);
+        int done = taskRepository.countByStatus(TaskStatus.DONE);
+        int total = toDo + inProgress + done;
+
+        return createTaskSummary(toDo, inProgress, done, total);
     }
 
     @Override

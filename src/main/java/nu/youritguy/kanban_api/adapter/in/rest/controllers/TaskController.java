@@ -2,16 +2,14 @@ package nu.youritguy.kanban_api.adapter.in.rest.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
-import nu.youritguy.kanban_api.adapter.in.rest.dtos.StatusInputDto;
-import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskInputDto;
-import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskDto;
-import nu.youritguy.kanban_api.adapter.in.rest.dtos.TaskOverviewDto;
+import nu.youritguy.kanban_api.adapter.in.rest.dtos.*;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
 import nu.youritguy.kanban_api.domain.models.Task;
 import nu.youritguy.kanban_api.domain.models.TaskOverview;
 import nu.youritguy.kanban_api.domain.models.TaskStatus;
+import nu.youritguy.kanban_api.domain.models.TaskSummary;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -84,6 +82,13 @@ public class TaskController {
         TaskOverview taskOverview = getTaskUseCase.getTaskOverview();
 
         return ResponseEntity.ok().body(TaskOverviewDto.createTaskOverview(taskOverview));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<TaskSummaryDto> getTaskSummary() {
+        TaskSummary taskSummary = getTaskUseCase.getTaskSummary();
+
+        return  ResponseEntity.ok().body(TaskSummaryDto.createTaskSummaryDto(taskSummary));
     }
 
     @PostMapping
