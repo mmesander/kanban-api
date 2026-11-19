@@ -5,16 +5,16 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskJpaMapper {
-    public TaskJpaEntity transformToEntity(Task task) {
-        TaskJpaEntity entity = new TaskJpaEntity();
+public class TaskEntityMapper {
+    public TaskEntity transformToEntity(Task task) {
+        TaskEntity entity = new TaskEntity();
 
         BeanUtils.copyProperties(task, entity);
 
         return entity;
     }
 
-    public Task transformToDomain(TaskJpaEntity entity) {
+    public Task transformToDomain(TaskEntity entity) {
         Task task = new Task();
 
         BeanUtils.copyProperties(entity, task);

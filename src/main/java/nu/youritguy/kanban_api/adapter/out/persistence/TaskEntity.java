@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "tasks")
-public class TaskJpaEntity {
+public class TaskEntity {
     @Id
     private UUID id;
 
@@ -37,9 +37,9 @@ public class TaskJpaEntity {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    public TaskJpaEntity() {}
+    public TaskEntity() {}
 
-    public TaskJpaEntity(UUID id, String title, String description, TaskStatus status, Instant createdAt, Instant updatedAt) {
+    public TaskEntity(UUID id, String title, String description, TaskStatus status, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.title = title;
         this.description = description;

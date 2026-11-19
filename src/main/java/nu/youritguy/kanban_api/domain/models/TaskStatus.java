@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum TaskStatus {
-
-
     TO_DO("To Do"),
     IN_PROGRESS("In Progress"),
     DONE("Done");
