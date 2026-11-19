@@ -86,9 +86,124 @@ whether the tables match the JPA entities. If they don't, the application will n
 
 ## Endpoints
 
-| Method  | URL          | Description                |
-|---------|--------------|----------------------------|
-| `POST`  | `/api/tasks` | Create a new task          |
+| Method   | URL                       | Description                                   |
+|----------|---------------------------|-----------------------------------------------|
+| `GET`    | `/api/tasks`              | [Get all tasks](#get-all-tasks)               |
+| `GET`    | `/api/tasks/{id}`         | [Get a task by id](#get-a-task-by-id)         |
+| `GET`    | `/api/tasks/status`       | [Get tasks by status](#get-tasks-by-status)   |
+| `GET`    | `/api/tasks/overview`     | [Board overview](#board-overview)             |
+| `GET`    | `/api/tasks/summary`      | [Task count per status](#task-summary)        |
+| `POST`   | `/api/tasks`              | [Create a new task](#create-a-task)           |
+| `PATCH`  | `/api/tasks/{id}`         | [Update a task](#update-a-task)               |
+| `PATCH`  | `/api/tasks/{id}/status`  | [Move a task to another status](#move-a-task) |
+| `DELETE` | `/api/tasks/{id}`         | [Delete a task](#delete-a-task)               |
+
+All endpoints return task data in the format below (the "task object"):
+
+```json
+{
+  "id": "3f2b8c1e-5d4a-4e7b-9c1a-2b6d8e0f7a91",
+  "title": "First task",
+  "description": "Test H2",
+  "status": "TO_DO",
+  "createdAt": "2026-11-18T10:15:30.123456Z",
+  "updatedAt": "2026-11-18T10:15:30.123456Z"
+}
+```
+
+Wherever a `status` is accepted as input, these values are allowed (case-insensitive):
+`TO_DO`, `IN_PROGRESS`, `DONE` or `To Do`, `In Progress`, `Done`.
+In responses, the status is always returned as `TO_DO`, `IN_PROGRESS` or `DONE`.
+
+### Get all tasks
+
+```
+GET http://localhost:8095/api/tasks
+```
+
+**Response** - `200 OK` with a list of task objects. Returns `[]` when there are no tasks.
+
+### Get a task by id
+
+```
+GET http://localhost:8095/api/tasks/{id}
+```
+
+**Response** - `200 OK` with a single task object.
+
+| Status          | When                       | Example body                                              |
+|-----------------|----------------------------|-----------------------------------------------------------|
+| `404 Not Found` | No task with this `id`     | `Can't find task [3f2b8c1e-5d4a-4e7b-9c1a-2b6d8e0f7a91]`  |
+
+### Get tasks by status
+
+```
+GET http://localhost:8095/api/tasks/status
+Content-Type: application/json
+```
+
+The status is sent in the **request body**:
+
+```json
+{
+  "status": "IN_PROGRESS"
+}
+```
+
+**Response** - `200 OK` with a list of task objects with this status. Returns `[]` when there are none.
+
+| Status            | When                       | Example body                                      |
+|-------------------|----------------------------|---------------------------------------------------|
+| `400 Bad Request` | `status` is missing/blank  | `status: Status should not be empty`              |
+| `400 Bad Request` | Unknown `status`           | `Status [BUSY] unknown. Allowed values: ...`      |
+
+> **Note:** this is a `GET` request with a body. Not every client supports that: Swagger UI
+> and browsers don't send a body with `GET`. Use curl, PowerShell or Postman instead.
+
+```bash
+curl -X GET http://localhost:8095/api/tasks/status \
+  -H "Content-Type: application/json" \
+  -d '{"status":"IN_PROGRESS"}'
+```
+
+### Board overview
+
+```
+GET http://localhost:8095/api/tasks/overview
+```
+
+Returns all tasks, grouped per column of the board.
+
+**Example response** - `200 OK`
+
+```json
+{
+  "toDo": [ { "id": "...", "title": "First task", "status": "TO_DO", "...": "..." } ],
+  "inProgress": [],
+  "done": []
+}
+```
+
+Each list contains task objects. Empty columns are returned as `[]`.
+
+### Task summary
+
+```
+GET http://localhost:8095/api/tasks/summary
+```
+
+Returns the number of tasks per status.
+
+**Example response** - `200 OK`
+
+```json
+{
+  "toDo": 3,
+  "inProgress": 1,
+  "done": 2,
+  "total": 6
+}
+```
 
 ### Create a task
 
@@ -158,6 +273,100 @@ Invoke-RestMethod -Method Post -Uri http://localhost:8095/api/tasks `
 curl -X POST http://localhost:8095/api/tasks \
   -H "Content-Type: application/json" \
   -d '{"title":"First task","description":"Test H2","status":"TO_DO"}'
+```
+
+### Update a task
+
+```
+PATCH http://localhost:8095/api/tasks/{id}
+Content-Type: application/json
+```
+
+Partially updates a task: only the fields you send are changed. `updatedAt` is set to the current time.
+
+**Request body** - all fields are optional
+
+| Field         | Type   | Rules                                                                   |
+|---------------|--------|-------------------------------------------------------------------------|
+| `title`       | string | 1 to 100 characters. Ignored when left out or blank                     |
+| `description` | string | Max 500 characters. Ignored when left out or blank                      |
+| `status`      | string | See allowed status values above. Ignored when left out or blank         |
+
+> **Note:** because blank values are ignored, a description cannot be cleared via this endpoint.
+
+**Example request**
+
+```json
+{
+  "title": "Renamed task",
+  "description": "New description"
+}
+```
+
+**Response** - `200 OK` with the updated task object.
+
+| Status            | When                                         | Example body                                             |
+|-------------------|----------------------------------------------|----------------------------------------------------------|
+| `400 Bad Request` | `title` is empty (`""`) or longer than 100 characters | `title: Title must be between 1 and 100 characters` |
+| `400 Bad Request` | `description` is longer than 500 characters  | `description: Description can't exceed 500 characters`   |
+| `400 Bad Request` | Unknown `status`                             | `Status [BUSY] unknown. Allowed values: ...`             |
+| `404 Not Found`   | No task with this `id`                       | `Can't find task [3f2b8c1e-...]`                         |
+
+```bash
+curl -X PATCH http://localhost:8095/api/tasks/{id} \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Renamed task"}'
+```
+
+### Move a task
+
+```
+PATCH http://localhost:8095/api/tasks/{id}/status
+Content-Type: application/json
+```
+
+Moves a task to another column of the board. `updatedAt` is set to the current time.
+
+**Request body**
+
+```json
+{
+  "status": "DONE"
+}
+```
+
+**Response** - `200 OK` with the updated task object.
+
+| Status            | When                       | Example body                                  |
+|-------------------|----------------------------|-----------------------------------------------|
+| `400 Bad Request` | `status` is missing/blank  | `status: Status should not be empty`          |
+| `400 Bad Request` | Unknown `status`           | `Status [BUSY] unknown. Allowed values: ...`  |
+| `404 Not Found`   | No task with this `id`     | `Can't find task [3f2b8c1e-...]`              |
+
+```bash
+curl -X PATCH http://localhost:8095/api/tasks/{id}/status \
+  -H "Content-Type: application/json" \
+  -d '{"status":"DONE"}'
+```
+
+### Delete a task
+
+```
+DELETE http://localhost:8095/api/tasks/{id}
+```
+
+**Response** - `200 OK` with a plain-text confirmation:
+
+```
+Deleted task [3f2b8c1e-5d4a-4e7b-9c1a-2b6d8e0f7a91]
+```
+
+| Status          | When                       | Example body                       |
+|-----------------|----------------------------|------------------------------------|
+| `404 Not Found` | No task with this `id`     | `Can't find task [3f2b8c1e-...]`   |
+
+```bash
+curl -X DELETE http://localhost:8095/api/tasks/{id}
 ```
 
 ## Swagger UI
