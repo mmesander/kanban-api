@@ -12,6 +12,6 @@ public class RecordNotFoundException extends RuntimeException {
     }
 
     public RecordNotFoundException(UUID id) {
-        super(String.format("Can't find task [%s]", id));
+        super(String.format("Task [%s] not found", id));
     }
 }
