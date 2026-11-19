@@ -1,7 +1,11 @@
 package nu.youritguy.kanban_api.adapter.in.rest.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
 import nu.youritguy.kanban_api.domain.models.TaskSummary;
 
+@Getter
+@Setter
 public class TaskSummaryDto {
     private int toDo;
     private int inProgress;
