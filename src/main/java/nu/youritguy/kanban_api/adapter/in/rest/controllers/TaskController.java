@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import nu.youritguy.kanban_api.adapter.in.rest.dtos.*;
 import nu.youritguy.kanban_api.application.ports.in.CreateTaskUseCase;
+import nu.youritguy.kanban_api.application.ports.in.DeleteTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.GetTaskUseCase;
 import nu.youritguy.kanban_api.application.ports.in.PatchTaskUseCase;
 import nu.youritguy.kanban_api.domain.exceptions.InvalidInputException;
@@ -31,11 +32,14 @@ public class TaskController {
     private final GetTaskUseCase getTaskUseCase;
     private final CreateTaskUseCase createTaskUseCase;
     private final PatchTaskUseCase patchTaskUseCase;
+    private final DeleteTaskUseCase deleteTaskUseCase;
 
-    public TaskController(CreateTaskUseCase createTaskUseCase, GetTaskUseCase getTaskUseCase, PatchTaskUseCase patchTaskUseCase) {
+    public TaskController(CreateTaskUseCase createTaskUseCase, GetTaskUseCase getTaskUseCase,
+                          PatchTaskUseCase patchTaskUseCase, DeleteTaskUseCase deleteTaskUseCase) {
         this.createTaskUseCase = createTaskUseCase;
         this.getTaskUseCase = getTaskUseCase;
         this.patchTaskUseCase = patchTaskUseCase;
+        this.deleteTaskUseCase = deleteTaskUseCase;
     }
 
     @GetMapping
@@ -158,6 +162,7 @@ public class TaskController {
     public ResponseEntity<Object> deleteTask(
             @PathVariable("id") UUID id
     ) {
+        deleteTaskUseCase.deleteTask(id);
         String confirmation = String.format("Deleted task [%s]", id);
 
         return ResponseEntity.ok().body(confirmation);
